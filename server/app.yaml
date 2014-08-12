@@ -1,0 +1,27 @@
+application: gae-storage-example
+version: v1
+runtime: go
+api_version: go1
+
+skip_files:
+- ^(.*/)?app\.yaml
+- ^(.*/)?app\.yml
+- ^(.*/)?index\.yaml
+- ^(.*/)?index\.yml
+- ^(.*/)?#.*#
+- ^(.*/)?.*~
+- ^(.*/)?.*\.py[co]
+- ^(.*/)?.*/RCS/.*
+- ^(.*/)?\..*
+- ^(.*/)?adm/.*
+- ^(.*/)?desktop/.*
+- ^(.*/)?node_modules/
+- ^(.*/)?bower_components/
+- ^(.*/)?.*\.coffee
+- ^(.*/)?.*\.scss
+- ^(.*/)?datastore
+
+handlers:
+- url: /.*
+  secure: always
+  script: _go_app
