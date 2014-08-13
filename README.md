@@ -1,0 +1,1 @@
+Messy, non working example of how to use Google Cloud Storage from Go using Service Account Authentication.
