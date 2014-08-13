@@ -59,7 +59,7 @@ func api_listObjects(w http.ResponseWriter, r *http.Request) {
 
 	err = initDefaultBucket(service)
 	if err != nil {
-		http.Error(w, "Failed to create bucket, error: "+err.Error()+" scope: "+storage.DevstorageFull_controlScope, http.StatusInternalServerError)
+		http.Error(w, "Failed to create bucket, error: "+err.Error()+" scope: "+scope, http.StatusInternalServerError)
 		return
 	}
 
