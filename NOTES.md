@@ -7,6 +7,6 @@ https://code.google.com/p/goauth2/source/browse/appengine/serviceaccount/service
 https://groups.google.com/forum/#!topic/google-appengine-go/qZDQHkzEFMU
 
 
-1. Create Oauth 2.0 Client Id -> Service Account in Cloud Console.
-2. Download the JSON and store it in server/
-3. Enable Cloud Integration in appengine console
+1. Enable Cloud Integration in appengine console
+2. Create Oauth 2.0 Client Id -> Service Account in Cloud Console.
+3. Download the JSON and store it as `server/storage_dev_privatekey.json`
