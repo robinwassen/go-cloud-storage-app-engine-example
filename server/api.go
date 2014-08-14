@@ -2,6 +2,8 @@ package server
 
 import (
 	"appengine"
+	"appengine/blobstore"
+	"appengine/image"
 	"code.google.com/p/google-api-go-client/storage/v1beta2"
 	"fmt"
 	"github.com/gorilla/mux"
@@ -28,10 +30,33 @@ func api_listObjects(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// Get the media link for an object.
+func api_mediaLinkObject(w http.ResponseWriter, r *http.Request) {
+	// We use the blob store + images to generate a serving url for the file
+	c := appengine.NewContext(r)
+	vars := mux.Vars(r)
+
+	bk, err := blobstore.BlobKeyForFile(c, "/gs/"+bucketName+"/"+vars["key"])
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if imageUrl, err := image.ServingURL(c, bk, nil); err == nil {
+		fmt.Fprint(w, imageUrl)
+	} else {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
 // Read an object by key from the Cloud Storage Bucket
 func api_readObject(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	fmt.Fprint(w, vars["key"])
+
+	// TODO: Implement me!
 }
 
 // Create an object in the Cloud Storage Bucket

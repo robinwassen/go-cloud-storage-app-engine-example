@@ -15,6 +15,7 @@ func init() {
 	o := r.PathPrefix("/storage/object").Subrouter()
 	o.HandleFunc("/", api_listObjects).Methods("GET")
 	o.HandleFunc("/", api_createObject).Methods("POST")
+	o.HandleFunc("/{key}/medialink/", api_mediaLinkObject).Methods("GET")
 	o.HandleFunc("/{key}/", api_readObject).Methods("GET")
 	o.HandleFunc("/{key}/", api_deleteObject).Methods("DELETE")
 	http.Handle("/", r)
