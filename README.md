@@ -17,3 +17,4 @@ Todo:
 1. Enable Cloud Integration in appengine console
 2. Create Oauth 2.0 Client Id -> Service Account in Cloud Console.
 3. Download the JSON and store it as `server/storage_dev_privatekey.json`
+4. Edit the values `server/config.go` to match your project and bucket.
