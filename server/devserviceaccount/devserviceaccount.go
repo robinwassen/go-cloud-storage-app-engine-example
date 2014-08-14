@@ -24,7 +24,7 @@ import (
 // NewClient returns an *http.Client authorized for the
 // given scopes with the service account define by the given pem key file and client-secret json file
 // Tokens are cached in memcache until they expire.
-func NewClient(c appengine.Context, clientSecretFileName string, pemKeyFileName string, scopes ...string) (*http.Client, error) {
+func NewClient(c appengine.Context, clientSecretFileName string, scopes ...string) (*http.Client, error) {
 	t := &transport{
 		Context: c,
 		Scopes:  scopes,
@@ -34,7 +34,6 @@ func NewClient(c appengine.Context, clientSecretFileName string, pemKeyFileName 
 			AllowInvalidServerCertificate: false,
 		},
 		ClientSecretFileName: clientSecretFileName,
-		PemKeyFileName:       pemKeyFileName,
 		TokenCache: &cache{
 			Context: c,
 			Key:     "goauth2_serviceaccount_" + strings.Join(scopes, "_"),
@@ -59,7 +58,14 @@ type transport struct {
 	TokenCache oauth.Cache
 
 	ClientSecretFileName string
-	PemKeyFileName       string
+}
+
+type keyConfig struct {
+	PrivateKeyID string `json:"private_key_id"`
+	PrivateKey   string `json:"private_key"`
+	ClientEmail  string `json:"client_email"`
+	ClientID     string `json:"client_id"`
+	Type         string `json:"type"`
 }
 
 func (t *transport) Refresh() error {
@@ -75,27 +81,16 @@ func (t *transport) Refresh() error {
 		return fmt.Errorf("Error reading file %q: %v", t.ClientSecretFileName, err)
 	}
 
-	var config struct {
-		Web struct {
-			ClientEmail string `json:"client_email"`
-			ClientID    string `json:"client_id"`
-			TokenURI    string `json:"token_uri"`
-		}
-	}
+	var config keyConfig
+
 	err = json.Unmarshal(secretFileBytes, &config)
 	if err != nil {
 		return fmt.Errorf("Failed to unmarshall json in %q: %v", t.ClientSecretFileName, err)
 	}
 
-	// Read the pem file bytes for the private key.
-	pemKeyFileBytes, err := ioutil.ReadFile(t.PemKeyFileName)
-	if err != nil {
-		return fmt.Errorf("Error reading file %q: %v", t.PemKeyFileName, err)
-	}
-
 	// Craft the ClaimSet and JWT token.
-	jwtToken := jwt.NewToken(config.Web.ClientEmail, strings.Join(t.Scopes, " "), pemKeyFileBytes)
-	jwtToken.ClaimSet.Aud = config.Web.TokenURI // just in case: assume that TokenURI from secret.json is more current than the default jwt package's
+	jwtToken := jwt.NewToken(config.ClientEmail, strings.Join(t.Scopes, " "), []byte(config.PrivateKey))
+	//jwtToken.ClaimSet.Aud = config.Web.TokenURI // just in case: assume that TokenURI from secret.json is more current than the default jwt package's
 
 	// assert the jwtToken to get the oAuth Token
 	client := urlfetch.Client(t.Context)

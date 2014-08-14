@@ -7,7 +7,6 @@ import (
 	"devserviceaccount"
 	"fmt"
 	"github.com/gorilla/mux"
-	"io"
 	"net/http"
 )
 
@@ -16,7 +15,7 @@ func init() {
 
 	o := r.PathPrefix("/storage/object").Subrouter()
 	o.HandleFunc("/", api_listObjects).Methods("GET")
-	o.HandleFunc("/{key}/", api_createObject).Methods("POST")
+	o.HandleFunc("/", api_createObject).Methods("POST")
 	o.HandleFunc("/{key}/", api_readObject).Methods("GET")
 	o.HandleFunc("/{key}/", api_deleteObject).Methods("DELETE")
 	http.Handle("/", r)
@@ -28,7 +27,7 @@ func newStorageService(c appengine.Context) (*storage.Service, error) {
 	var err error
 
 	if appengine.IsDevAppServer() {
-		httpClient, err = devserviceaccount.NewClient(c, devStorageClientSecretPath, devStorageSecretKeyPath, scope)
+		httpClient, err = devserviceaccount.NewClient(c, devStorageKeyPath, scope)
 	} else {
 		httpClient, err = serviceaccount.NewClient(c, scope)
 	}
@@ -39,6 +38,10 @@ func newStorageService(c appengine.Context) (*storage.Service, error) {
 
 	service, err := storage.New(httpClient)
 	if err != nil {
+		return nil, err
+	}
+
+	if err = initDefaultBucket(service); err != nil {
 		return nil, err
 	}
 
@@ -66,13 +69,8 @@ func api_listObjects(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = initDefaultBucket(service)
-	if err != nil {
-		http.Error(w, "Failed to create bucket, error: "+err.Error()+" scope: "+scope, http.StatusInternalServerError)
-		return
-	}
-
 	if res, err := service.Objects.List(bucketName).Do(); err == nil {
+		fmt.Fprintln(w, "Listing objects:")
 		for _, object := range res.Items {
 			fmt.Println(object.Name)
 		}
@@ -97,12 +95,16 @@ func api_createObject(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	vars := mux.Vars(r)
-	object := &storage.Object{Name: vars["key"]}
+	file, fileHeader, err := r.FormFile("file")
 
-	var ioR io.Reader // TODO: Replace me with a valid reader
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
-	if res, err := service.Objects.Insert(bucketName, object).Media(ioR).Do(); err == nil {
+	object := &storage.Object{Name: fileHeader.Filename}
+
+	if res, err := service.Objects.Insert(bucketName, object).Media(file).Do(); err == nil {
 		fmt.Printf("Created object %v at location %v\n\n", res.Name, res.SelfLink)
 	} else {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

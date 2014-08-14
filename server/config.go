@@ -6,10 +6,9 @@ import (
 
 const (
 	// Change these variable to match your personal information.
-	bucketName = "YOUR_BUCKET_NAME_TEST"
-	projectID  = "YOUR_PROJECT_ID_TEST" // the app engine project id - used for creating buckets.
-	scope      = storage.DevstorageFull_controlScope
+	bucketName = "digiexam-play.appspot.com"
+	projectID  = "digiexam-play" // the app engine project id - used for creating buckets.
+	scope      = storage.DevstorageRead_writeScope
 
-	devStorageClientSecretPath = "storage_dev_clientsecret.json"
-	devStorageSecretKeyPath    = "storage_dev_privatekey.pem"
+	devStorageKeyPath = "storage_dev_privatekey.json"
 )
