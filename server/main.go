@@ -123,7 +123,7 @@ func api_deleteObject(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := service.Objects.Delete(bucketName, vars["key"]).Do(); err == nil {
-		fmt.Fprintf(w, "Successfully deleted %s/%s during cleanup.\n\n", bucketName, vars["key"])
+		fmt.Fprintf(w, "Successfully deleted %s/%s.", bucketName, vars["key"])
 	} else {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
