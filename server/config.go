@@ -9,4 +9,7 @@ const (
 	bucketName = "YOUR_BUCKET_NAME_TEST"
 	projectID  = "YOUR_PROJECT_ID_TEST" // the app engine project id - used for creating buckets.
 	scope      = storage.DevstorageFull_controlScope
+
+	devStorageClientSecretPath = "storage_dev_clientsecret.json"
+	devStorageSecretKeyPath    = "storage_dev_privatekey.pem"
 )

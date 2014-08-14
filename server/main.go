@@ -4,6 +4,7 @@ import (
 	"appengine"
 	"code.google.com/p/goauth2/appengine/serviceaccount"
 	"code.google.com/p/google-api-go-client/storage/v1beta2"
+	"devserviceaccount"
 	"fmt"
 	"github.com/gorilla/mux"
 	"io"
@@ -23,7 +24,15 @@ func init() {
 
 // Creates a new Google Cloud Storage Client
 func newStorageService(c appengine.Context) (*storage.Service, error) {
-	httpClient, err := serviceaccount.NewClient(c, scope)
+	var httpClient *http.Client
+	var err error
+
+	if appengine.IsDevAppServer() {
+		httpClient, err = devserviceaccount.NewClient(c, devStorageClientSecretPath, devStorageSecretKeyPath, scope)
+	} else {
+		httpClient, err = serviceaccount.NewClient(c, scope)
+	}
+
 	if err != nil {
 		return nil, err
 	}
