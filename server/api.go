@@ -30,8 +30,8 @@ func api_listObjects(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// Get the media link for an object.
-func api_mediaLinkObject(w http.ResponseWriter, r *http.Request) {
+// Get the image link for an object.
+func api_imageLinkObject(w http.ResponseWriter, r *http.Request) {
 	// We use the blob store + images to generate a serving url for the file
 	c := appengine.NewContext(r)
 	vars := mux.Vars(r)
