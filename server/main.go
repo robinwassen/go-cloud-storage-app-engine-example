@@ -72,7 +72,7 @@ func api_listObjects(w http.ResponseWriter, r *http.Request) {
 	if res, err := service.Objects.List(bucketName).Do(); err == nil {
 		fmt.Fprintln(w, "Listing objects:")
 		for _, object := range res.Items {
-			fmt.Println(object.Name)
+			fmt.Fprintln(w, object.Name)
 		}
 	} else {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
