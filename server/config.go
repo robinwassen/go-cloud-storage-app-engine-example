@@ -10,6 +10,15 @@ const (
 	projectID         = "digiexam-play"               // Project ID is the one found in the cloud console
 	devStorageKeyPath = "storage_dev_privatekey.json" // This file is downloaded from the cloud console
 
-	// No touching!
+	// Set this according to: 
+	// https://github.com/google/google-api-go-client/blob/master/storage/v1/storage-gen.go
+	// write_scope will work for all file uploading
+	// use full_control if you wish to pass along metadata in the attributes object e.g.
+	//
+	// object := &storage.Object{
+	//	Name:        fileHeader.Filename,
+	//	ContentType: YOUR_CONTENT_TYPE,
+	//}
+
 	scope = storage.DevstorageRead_writeScope // TODO: Figure out exactly what this does.
 )
